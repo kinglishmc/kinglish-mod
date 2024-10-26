@@ -2,7 +2,7 @@ name: Build and Release
 on:
   push:
     branches:
-      - main
+      - 1.21.3/fabric
     tags:
       - '*'
   pull_request:
