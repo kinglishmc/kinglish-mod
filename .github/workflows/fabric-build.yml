@@ -2,7 +2,7 @@ name: Build and Release
 on:
   push:
     branches:
-      - 1.21.3/fabric
+      - main
     tags:
       - '*'
   pull_request:
@@ -71,6 +71,7 @@ jobs:
         with:
           files: ${{ env.MOD_FILE }}
           tag_name: ${{ env.VERSION }}
+          name: ${{ env.VERSION }}
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
