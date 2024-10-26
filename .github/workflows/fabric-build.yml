@@ -2,7 +2,9 @@ name: Build and Release
 on:
   push:
     branches:
-      - 1.21.3/fabric
+      - main
+    tags:
+      - '*'
   pull_request:
   release:
     types: [published]
@@ -36,6 +38,14 @@ jobs:
         id: find_jar
         run: echo "MOD_FILE=$(ls build/libs/*.jar | head -n 1)" >> $GITHUB_ENV
 
+      - name: Create or Update Static Git Tag
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag -f autogen
+          git push -f origin autogen
+
   release:
     name: Publish JAR and Upload to Modrinth
     runs-on: ubuntu-latest
@@ -54,6 +64,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: ${{ env.MOD_FILE }}
+          tag_name: autogen
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
