@@ -63,5 +63,5 @@ jobs:
           token: ${{ secrets.MODRINTH_TOKEN }}
           project: ro29R42L
           file: ${{ env.MOD_FILE }}
-          changelog: From GitHub - ${{ github.event.release.body }}
+          changelog: This release is from GitHub - ${{ github.event.release.body }}
           loaders: fabric
