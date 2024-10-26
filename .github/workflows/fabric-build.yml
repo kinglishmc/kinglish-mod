@@ -2,12 +2,14 @@ name: Build and Release
 on:
   push:
     branches:
-      - main
+      - 1.21.3/fabric
     tags:
       - '*'
   pull_request:
   release:
-    types: [published]
+    types: 
+      - created
+      - published
 
 jobs:
   build:
@@ -45,7 +47,7 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Create Git Tag Based on Version
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/1.21.3/fabric'
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
