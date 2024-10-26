@@ -1,0 +1,30 @@
+{
+	"schemaVersion": 1,
+	"id": "kinglish",
+	"version": "${version}",
+	"name": "Kinglish",
+	"description": "A library dedicated on translating mods to UK English.",
+	"authors": [
+		"Rayanzay"
+	],
+	"contact": {
+		"homepage": "https://modrinth.com/project/kinglish",
+		"sources": "https://github.com/Rayanzay/kinglish"
+	},
+	"license": "MIT",
+	"icon": "assets/kinglish/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"me.rayanzay.Kinglish"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.16.7",
+		"minecraft": "~1.21.3",
+		"java": ">=21"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
