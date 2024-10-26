@@ -1,4 +1,4 @@
-name: build
+name: fabric-build
 on: [pull_request, push]
 
 jobs:
@@ -49,30 +49,17 @@ jobs:
           # Generate the changelog
           CHANGELOG="This version is from a GitHub commit/change. You can see the full details of the commit at [${COMMIT_SHA}](${COMMIT_URL})\n\nCommit Details:\n${COMMIT_MESSAGE}"
 
-          # Calculate file hash
-          SHA1_HASH=$(sha1sum "$MOD_FILE" | awk '{ print $1 }')
-
-          # Create the version on Modrinth using v2 API
+          # Upload the file and create the version on Modrinth using v2 API
           curl -X POST "https://api.modrinth.com/v2/version" \
           -H "Authorization: ${{ secrets.MODRINTH_TOKEN }}" \
-          -H "Content-Type: application/json" \
-          -d '{
-            "project_id": "ro29R42L",
-            "version_number": "'"$VERSION_NAME"'",
-            "changelog": "'"$CHANGELOG"'",
-            "game_versions": ["1.21.3"],
-            "version_type": "release",
-            "loaders": ["fabric"],
-            "featured": false,
-            "status": "listed",
-            "files": [
-              {
-                "hashes": {
-                  "sha1": "'"$SHA1_HASH"'"
-                },
-                "filename": "'"$MOD_FILE_NAME"'",
-                "primary": true,
-                "url": "https://example.com" # Replace with actual file URL after uploading the file separately
-              }
-            ]
-          }'
+          -F "data={
+              \"project_id\": \"ro29R42L\",
+              \"version_number\": \"${VERSION_NAME}\",
+              \"changelog\": \"${CHANGELOG}\",
+              \"game_versions\": [\"1.21.3\"],
+              \"version_type\": \"release\",
+              \"loaders\": [\"fabric\"],
+              \"featured\": false,
+              \"status\": \"listed\"
+          }" \
+          -F "file=@${MOD_FILE};type=application/java-archive"
