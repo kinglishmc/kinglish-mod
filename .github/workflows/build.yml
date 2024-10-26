@@ -1,8 +1,3 @@
-# Automatically build the project and run any configured tests for every push
-# and submitted pull request. This can help catch issues that only occur on
-# certain platforms or Java versions, and provides a first line of defence
-# against bad commits.
-
 name: build
 on: [pull_request, push]
 
@@ -35,3 +30,30 @@ jobs:
         with:
           name: Artifacts
           path: build/libs/
+      - name: Upload to Modrinth
+        if: success() # Only run this if the build succeeded
+        run: |
+          # Automatically detect the mod file
+          MOD_FILE=$(ls build/libs/*.jar | head -n 1)
+
+          # Set version name
+          VERSION="1.0.0" # Replace this with your actual version logic if needed
+          BUILD_NUMBER="${{ github.run_number }}"
+          VERSION_NAME="Kinglish $VERSION+$BUILD_NUMBER"
+
+          curl -X POST "https://api.modrinth.com/v1/version" \
+          -H "Authorization: ${{ secrets.MODRINTH_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "project_id": "ro29R42L",
+            "version_number": "'"$VERSION_NAME"'",
+            "changelog": "Build #'"$BUILD_NUMBER"'",
+            "loaders": ["fabric"],
+            "files": [
+              {
+                "path": "'"$MOD_FILE"'",
+                "file": "file_name"
+              }
+            ],
+            "game_versions": ["1.21.3"]
+          }'
