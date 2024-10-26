@@ -5,49 +5,45 @@ jobs:
   build:
     strategy:
       matrix:
-        # Use these Java versions
-        java: [
-          21,    # Current Java LTS
-        ]
+        java: [21]  # Current Java LTS
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
+      
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@v2
-
+      
       - name: Setup JDK ${{ matrix.java }}
         uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java }}
           distribution: 'microsoft'
-
+      
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
-
+      
       - name: Build
         run: ./gradlew build
-
+      
       - name: Capture build artifacts
-        if: ${{ matrix.java == '21' }} # Only upload artifacts built from latest Java
+        if: ${{ matrix.java == '21' }}
         uses: actions/upload-artifact@v4
         with:
           name: Artifacts
           path: build/libs/
 
-      - name: Publish to Modrinth
-        if: success() # Only run this if the build succeeded
-        uses: cloudnode-pro/modrinth-publish@v1
+      - name: Upload to Modrinth
+        if: success()  # Only run if previous steps are successful
+        uses: cloudnode-pro/modrinth-publish@1.0.0
         with:
-          token: ${{ secrets.MODRINTH_TOKEN }} # Required Modrinth API token
-          project: ro29R42L # Your Modrinth project ID
-          file: build/libs/*.jar # Path to your built jar file
+          token: ${{ secrets.MODRINTH_TOKEN }}
+          project: ro29R42L  # Your Modrinth project ID
+          file: build/libs/YourModFile.jar  # Replace with your actual file path
           changelog: |
-            This version is from a GitHub commit/change. You can see the full details of the commit at [${{ github.sha }}](${{ github.event.head_commit.url }})
+            This version is from a GitHub commit/change. You can see the full details of the commit at [#commit](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA})
 
             Commit Details:
-            ${{ github.event.head_commit.message }}
-          loaders: fabric # Mod loaders that this version supports
-          # Optionally, you can add dependencies if needed
-          # dependencies: '["dependency-project-id@version"]'
+            ${GITHUB_SHA}
+          loaders: fabric  # Specify the loaders you want to support
+          api-domain: api.modrinth.com  # Default API domain
