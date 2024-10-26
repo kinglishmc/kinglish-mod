@@ -39,6 +39,13 @@ jobs:
         run: |
           # Automatically detect the mod file
           MOD_FILE=$(ls build/libs/*.jar | head -n 1)
+          
+          # Check if the file exists
+          if [ ! -f "$MOD_FILE" ]; then
+            echo "Mod file not found: $MOD_FILE"
+            exit 1
+          fi
+
           MOD_FILE_NAME=$(basename "$MOD_FILE") # Get the filename without the path
 
           # Set version name
