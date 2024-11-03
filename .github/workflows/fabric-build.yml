@@ -2,12 +2,14 @@ name: Build and Release
 on:
   push:
     branches:
-      - main
+      - 1.21.3/fabric
     tags:
       - '*'
   pull_request:
   release:
-    types: [published]
+    types: 
+      - created
+      - published
 
 jobs:
   build:
@@ -38,13 +40,19 @@ jobs:
         id: find_jar
         run: echo "MOD_FILE=$(ls build/libs/*.jar | head -n 1)" >> $GITHUB_ENV
 
-      - name: Create or Update Static Git Tag
-        if: github.ref == 'refs/heads/main'
+      - name: Extract Version from Gradle
+        id: get_version
+        run: |
+          VERSION=$(./gradlew properties -q | grep "^version:" | awk '{print $2}')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Create Git Tag Based on Version
+        if: github.ref == 'refs/heads/1.21.3/fabric'
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git tag -f autogen
-          git push -f origin autogen
+          git tag -f ${{ env.VERSION }}
+          git push -f origin ${{ env.VERSION }}
 
   release:
     name: Publish JAR and Upload to Modrinth
@@ -64,7 +72,8 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: ${{ env.MOD_FILE }}
-          tag_name: autogen
+          tag_name: ${{ env.VERSION }}
+          name: ${{ env.VERSION }}
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
